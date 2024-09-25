@@ -1,43 +1,41 @@
 pipeline {
     agent any
+
     environment {
         DOCKER_USERNAME = 'taimooranwar'
         DOCKER_PASSWORD = 'Ta#1#2#3#4'
     }
+
     stages {
-        stage('Checkout code') {
+        stage('Checkout Code') {
             steps {
-                git branch: 'master', url: 'https://your-repo-url.git'
+                checkout scm
             }
         }
+
         stage('Set up Python') {
             steps {
                 sh 'python3 -m pip install --upgrade pip'
-            }
-        }
-        stage('Install dependencies') {
-            steps {
                 sh 'pip3 install -r requirements.txt'
             }
         }
-        stage('Build Docker image') {
+
+        stage('Build Docker Image') {
             steps {
                 sh 'docker build -t bitcoin-flask-app .'
             }
         }
-        stage('Login to Docker Hub') {
+
+        stage('Docker Login') {
             steps {
-                script {
-                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                }
+                sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
             }
         }
-        stage('Push Docker image to Docker Hub') {
+
+        stage('Push Docker Image') {
             steps {
-                script {
-                    sh "docker tag bitcoin-flask-app ${DOCKER_USERNAME}/bitcoin-flask-app:latest"
-                    sh "docker push ${DOCKER_USERNAME}/bitcoin-flask-app:latest"
-                }
+                sh 'docker tag bitcoin-flask-app $DOCKER_USERNAME/bitcoin-flask-app:latest'
+                sh 'docker push $DOCKER_USERNAME/bitcoin-flask-app:latest'
             }
         }
     }
